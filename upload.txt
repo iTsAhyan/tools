@@ -34,7 +34,6 @@ def run_uploader():
     print("  STEP 2: Enter Your GitHub Information  ")
     print("-----------------------------------------")
     
-    # জটিল টার্মিনাল রিডাইরেকশন বাদ দিয়ে সরাসরি স্ট্যান্ডার্ড ইনপুট নেওয়া হচ্ছে
     token = input("[?] Enter your GitHub Personal Access Token: ").strip()
     repo = input("[?] Enter your target GitHub Repository Name: ").strip()
     user = input("[?] Enter your GitHub Username: ").strip()
@@ -50,27 +49,37 @@ def run_uploader():
         target_dir = subdirs[0]
 
     def run_cmd(cmd, cwd=None):
-        subprocess.run(cmd, shell=True, check=True, cwd=cwd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return subprocess.run(cmd, shell=True, check=True, cwd=cwd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
     print("\n[+] Pushing your project files to GitHub (Please wait)...")
     try:
-        run_cmd("git init", cwd=target_dir)
-        run_cmd(f"git config --global user.name '{user}'", cwd=target_dir)
-        run_cmd(f"git config --global user.email '{email}'", cwd=target_dir)
+        subprocess.run("git init", shell=True, cwd=target_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(f"git config --global user.name '{user}'", shell=True, cwd=target_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(f"git config --global user.email '{email}'", shell=True, cwd=target_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
-        run_cmd("git checkout -b main", cwd=target_dir)
-        run_cmd("git add .", cwd=target_dir)
-        run_cmd("git commit -m 'Project uploaded via Ahyan Creations Engine'", cwd=target_dir)
+        subprocess.run("git checkout -b main", shell=True, cwd=target_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run("git add .", shell=True, cwd=target_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run("git commit -m 'Project uploaded via Ahyan Creations Engine'", shell=True, cwd=target_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         remote_url = f"https://{token}@github.com/{user}/{repo}.git"
-        run_cmd(f"git remote add origin {remote_url}", cwd=target_dir)
-        run_cmd("git push -u origin main --force", cwd=target_dir)
+        subprocess.run(f"git remote add origin {remote_url}", shell=True, cwd=target_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
-        print("\n🎉 Congratulations! Your project files have been successfully uploaded to GitHub.")
-        print(f"🔗 Repository Link: https://github.com/{user}/{repo}")
-        print("=========================================")
+        # পুশ করার সময় এরর মেসেজ ট্র্যাক করার ব্যবস্থা
+        push_res = subprocess.run("git push -u origin main --force", shell=True, cwd=target_dir, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
         
+        if push_res.returncode == 0:
+            print("\n🎉 Congratulations! Your project files have been successfully uploaded to GitHub.")
+            print(f"🔗 Repository Link: https://github.com/{user}/{repo}")
+            print("=========================================")
+        else:
+            error_msg = push_res.stderr.decode().strip()
+            print("\n[!] Upload failed! GitHub rejected the request.")
+            print("👉 Please ensure that:")
+            print("   1. Your GitHub Token is valid and has 'repo' permissions.")
+            print("   2. You have already created the repository on GitHub with the exact same name.")
+            print(f"\n[Technical Details]: {error_msg}")
+            
     except Exception as e:
-        print(f"\n[!] Upload failed! Please verify your GitHub Token, Repository Name, or network connection.")
+        print(f"\n[!] An unexpected error occurred: {e}")
 
 run_uploader()
