@@ -1,15 +1,32 @@
 import os
 import zipfile
 import subprocess
-from google.colab import files
+import sys
+
+# কোলাব এনভায়রনমেন্ট চেক করা
+try:
+    from google.colab import files
+    is_colab = True
+except ImportError:
+    is_colab = False
 
 def run_uploader():
     print("=========================================")
     print("  AHYAN CREATIONS LTD - ZIP To GITHUB    ")
     print("=========================================")
     
+    if not is_colab:
+        print("\n[!] Error: This script must be executed inside a Google Colab Notebook cell.")
+        print("Please run it in a proper Colab environment.")
+        return
+
     print("\n[+] STEP 1: Please select the project ZIP file from your device:")
-    uploaded = files.upload()
+    try:
+        uploaded = files.upload()
+    except Exception as e:
+        print(f"\n[!] Browser Environment Error: {e}")
+        print("Tip: Make sure you are running this inside a standard Colab Code Cell.")
+        return
 
     if not uploaded:
         print("[!] Error: No file was uploaded. Process terminated!")
@@ -29,6 +46,9 @@ def run_uploader():
     print("\n-----------------------------------------")
     print("  STEP 2: Enter Your GitHub Information  ")
     print("-----------------------------------------")
+    
+    # ইনপুট নেওয়ার সময় যেন বাফারিং এরর না হয়
+    sys.stdin = open('/dev/tty', 'r') if os.path.exists('/dev/tty') else sys.stdin
     
     token = input("[?] Enter your GitHub Personal Access Token: ").strip()
     repo = input("[?] Enter your target GitHub Repository Name: ").strip()
