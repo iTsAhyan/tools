@@ -1,7 +1,6 @@
 import os
 import zipfile
 import subprocess
-import sys
 from google.colab import files
 
 def run_uploader():
@@ -34,9 +33,6 @@ def run_uploader():
     print("\n-----------------------------------------")
     print("  STEP 2: Enter Your GitHub Information  ")
     print("-----------------------------------------")
-    
-    # ইনপুট নেওয়ার সময় ইন্টারঅ্যাক্টিভ বাফারিং ফিক্স
-    sys.stdin = open('/dev/tty', 'r') if os.path.exists('/dev/tty') else sys.stdin
     
     token = input("[?] Enter your GitHub Personal Access Token: ").strip()
     repo = input("[?] Enter your target GitHub Repository Name: ").strip()
@@ -76,9 +72,4 @@ def run_uploader():
     except Exception as e:
         print(f"\n[!] Upload failed! Please verify your GitHub Token, Repository Name, or network connection.")
 
-    # কাজ শেষে তৈরি হওয়া ফাইলটি ক্লিন করে দেওয়া (অপশনাল কিন্তু প্রফেশনাল)
-    if os.path.exists('/content/upload.py'):
-        os.remove('/content/upload.py')
-
-if __name__ == "__main__":
-    run_uploader()
+run_uploader()
