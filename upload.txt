@@ -34,6 +34,7 @@ def run_uploader():
     print("  STEP 2: Enter Your GitHub Information  ")
     print("-----------------------------------------")
     
+    # জটিল টার্মিনাল রিডাইরেকশন বাদ দিয়ে সরাসরি স্ট্যান্ডার্ড ইনপুট নেওয়া হচ্ছে
     token = input("[?] Enter your GitHub Personal Access Token: ").strip()
     repo = input("[?] Enter your target GitHub Repository Name: ").strip()
     user = input("[?] Enter your GitHub Username: ").strip()
